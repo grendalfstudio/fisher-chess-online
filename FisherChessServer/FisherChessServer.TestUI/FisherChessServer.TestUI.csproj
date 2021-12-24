@@ -1,0 +1,103 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="BelarusChess.png" />
+    <None Remove="Chessboard.png" />
+    <None Remove="Highlight check.png" />
+    <None Remove="Highlight choosed piece.png" />
+    <None Remove="Highlight mouse move cell.png" />
+    <None Remove="Highlight valid move on piece.png" />
+    <None Remove="Highlight valid move.png" />
+    <None Remove="Resources\BelarusChess.png" />
+    <None Remove="Resources\Chessboard.png" />
+    <None Remove="Resources\Highlight check.png" />
+    <None Remove="Resources\Highlight choosed piece.png" />
+    <None Remove="Resources\Highlight mouse move cell.png" />
+    <None Remove="Resources\Highlight valid move on piece.png" />
+    <None Remove="Resources\Highlight valid move.png" />
+    <None Remove="Resources\PiecesSprites\Black bishop.png" />
+    <None Remove="Resources\PiecesSprites\Black king.png" />
+    <None Remove="Resources\PiecesSprites\Black knight.png" />
+    <None Remove="Resources\PiecesSprites\Black pawn.png" />
+    <None Remove="Resources\PiecesSprites\Black queen.png" />
+    <None Remove="Resources\PiecesSprites\Black rook.png" />
+    <None Remove="Resources\PiecesSprites\White bishop.png" />
+    <None Remove="Resources\PiecesSprites\White king.png" />
+    <None Remove="Resources\PiecesSprites\White knight.png" />
+    <None Remove="Resources\PiecesSprites\White pawn.png" />
+    <None Remove="Resources\PiecesSprites\White queen.png" />
+    <None Remove="Resources\PiecesSprites\White rook.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FisherChessServer.Core\FisherChessServer.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\BelarusChess.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Chessboard.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Highlight check.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Highlight choosed piece.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Highlight mouse move cell.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Highlight valid move on piece.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Highlight valid move.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\PiecesSprites\Black bishop.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\PiecesSprites\Black king.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\PiecesSprites\Black knight.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\PiecesSprites\Black pawn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\PiecesSprites\Black queen.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\PiecesSprites\Black rook.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\PiecesSprites\White bishop.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\PiecesSprites\White king.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\PiecesSprites\White knight.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\PiecesSprites\White pawn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\PiecesSprites\White queen.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\PiecesSprites\White rook.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+</Project>
