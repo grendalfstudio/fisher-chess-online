@@ -51,7 +51,7 @@ namespace FisherChessServer.Core.Models.Pieces
                     availableCells.Add(currentCell);
 
                     // If pawn did no move before
-                    if ((direction == MoveDirection.Up && Cell.Row == Chessboard.Length - 1) ||
+                    if ((direction == MoveDirection.Up && Cell.Row == Chessboard.Length - 2) ||
                         (direction == MoveDirection.Down && Cell.Row == 1))
                     {
                         currentCell = GetNextCell(direction, currentCell);
