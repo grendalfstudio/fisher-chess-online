@@ -163,6 +163,14 @@ namespace FisherChessServer.Core.Models
                 this[new Cell(1, i)] = _blackPlayerPieces.Pawns[i];
             }
 
+            for (int i = 2; i < 6; i++)
+            {
+                for (int j = 0; j < Length; j++)
+                {
+                    this[new Cell(i, j)] = null;
+                }
+            }
+
             #endregion
 
             #region White pieces placement
