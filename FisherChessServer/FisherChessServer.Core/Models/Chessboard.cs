@@ -25,27 +25,19 @@ namespace FisherChessServer.Core.Models
             this[new Cell(0, 6)] = _blackPlayerPieces.Knight2;
             this[new Cell(0, 7)] = _blackPlayerPieces.Rook2;
 
-            this[new Cell(1, 0)] = _blackPlayerPieces.PawnA;
-            this[new Cell(1, 1)] = _blackPlayerPieces.PawnB;
-            this[new Cell(1, 2)] = _blackPlayerPieces.PawnC;
-            this[new Cell(1, 3)] = _blackPlayerPieces.PawnD;
-            this[new Cell(1, 4)] = _blackPlayerPieces.PawnE;
-            this[new Cell(1, 5)] = _blackPlayerPieces.PawnF;
-            this[new Cell(1, 6)] = _blackPlayerPieces.PawnG;
-            this[new Cell(1, 7)] = _blackPlayerPieces.PawnH;
+            for (int i = 0; i < Length; i++)
+            {
+                this[new Cell(1, i)] = _blackPlayerPieces.Pawns[i];
+            }
 
             #endregion
 
             #region White pieces placement
 
-            this[new Cell(6, 0)] = _whitePlayerPieces.PawnA;
-            this[new Cell(6, 1)] = _whitePlayerPieces.PawnB;
-            this[new Cell(6, 2)] = _whitePlayerPieces.PawnC;
-            this[new Cell(6, 3)] = _whitePlayerPieces.PawnD;
-            this[new Cell(6, 4)] = _whitePlayerPieces.PawnE;
-            this[new Cell(6, 5)] = _whitePlayerPieces.PawnF;
-            this[new Cell(6, 6)] = _whitePlayerPieces.PawnG;
-            this[new Cell(6, 7)] = _whitePlayerPieces.PawnH;
+            for (int i = 0; i < Length; i++)
+            {
+                this[new Cell(6, i)] = _whitePlayerPieces.Pawns[i];
+            }
 
             this[new Cell(7, 0)] = _whitePlayerPieces.Rook1;
             this[new Cell(7, 1)] = _whitePlayerPieces.Knight1;
@@ -166,27 +158,19 @@ namespace FisherChessServer.Core.Models
             this[new Cell(0, row.Knight2)] = _blackPlayerPieces.Knight2;
             this[new Cell(0, row.Rook2)] =   _blackPlayerPieces.Rook2;
 
-            this[new Cell(1, 0)] = _blackPlayerPieces.PawnA;
-            this[new Cell(1, 1)] = _blackPlayerPieces.PawnB;
-            this[new Cell(1, 2)] = _blackPlayerPieces.PawnC;
-            this[new Cell(1, 3)] = _blackPlayerPieces.PawnD;
-            this[new Cell(1, 4)] = _blackPlayerPieces.PawnE;
-            this[new Cell(1, 5)] = _blackPlayerPieces.PawnF;
-            this[new Cell(1, 6)] = _blackPlayerPieces.PawnG;
-            this[new Cell(1, 7)] = _blackPlayerPieces.PawnH;
+            for (int i = 0; i < Length; i++)
+            {
+                this[new Cell(1, i)] = _blackPlayerPieces.Pawns[i];
+            }
 
             #endregion
 
             #region White pieces placement
 
-            this[new Cell(6, 0)] = _whitePlayerPieces.PawnA;
-            this[new Cell(6, 1)] = _whitePlayerPieces.PawnB;
-            this[new Cell(6, 2)] = _whitePlayerPieces.PawnC;
-            this[new Cell(6, 3)] = _whitePlayerPieces.PawnD;
-            this[new Cell(6, 4)] = _whitePlayerPieces.PawnE;
-            this[new Cell(6, 5)] = _whitePlayerPieces.PawnF;
-            this[new Cell(6, 6)] = _whitePlayerPieces.PawnG;
-            this[new Cell(6, 7)] = _whitePlayerPieces.PawnH;
+            for (int i = 0; i < Length; i++)
+            {
+                this[new Cell(6, i)] = _whitePlayerPieces.Pawns[i];
+            }
 
             this[new Cell(7, row.Rook1)] =   _whitePlayerPieces.Rook1;
             this[new Cell(7, row.Knight1)] = _whitePlayerPieces.Knight1;
