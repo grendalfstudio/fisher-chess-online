@@ -8,7 +8,7 @@ namespace FisherChessServer.Core.Models.Pieces
 {
     public class Rook : Piece
     {
-        public Rook(PlayerColor color, Cell cell, Chessboard chessboard) : base(PieceType.Rook, color, cell, chessboard)
+        public Rook(PlayerColor color, Cell? cell, Chessboard chessboard) : base(PieceType.Rook, color, cell, chessboard)
         {
         }
 

@@ -65,13 +65,7 @@ namespace FisherChessServer.Core
 
         public IEnumerable<Piece> GetAllPieces()
         {
-            var pieces = new List<Piece>();
-
-            foreach (var piece in _chessboard.StartBoard)
-                if (piece != null)
-                    pieces.Add(piece);
-
-            return pieces;
+            return _chessboard.GetAllPieces();
         }
 
         private bool IsCheck(PlayerColor player)

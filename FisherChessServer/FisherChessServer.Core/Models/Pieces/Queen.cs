@@ -8,7 +8,7 @@ namespace FisherChessServer.Core.Models.Pieces
 {
     public class Queen : Piece
     {
-        public Queen(PlayerColor color, Cell cell, Chessboard chessboard) : base(PieceType.Queen, color, cell, chessboard)
+        public Queen(PlayerColor color, Cell? cell, Chessboard chessboard) : base(PieceType.Queen, color, cell, chessboard)
         {
         }
 

@@ -51,7 +51,7 @@ namespace FisherChessServer.Core
             IsGameStarted = false;
         }
 
-        public Piece GetPieceAt(Cell cell)
+        public Piece? GetPieceAt(Cell cell)
         {
             return _gameService.GetPieceAt(cell);
         }
