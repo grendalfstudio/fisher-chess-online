@@ -11,16 +11,18 @@ namespace FisherChessServer.Core.Models
 
         public Chessboard()
         {
+            RandomPiecesRow row = GenerateRandomPiecesPlacement();
+
             #region Black pieces initialisation
 
-            StartBoard[0, 0] = new Rook  (PlayerColor.Black, new Cell(0, 0), this);
-            StartBoard[0, 1] = new Knight(PlayerColor.Black, new Cell(0, 1), this);
-            StartBoard[0, 2] = new Bishop(PlayerColor.Black, new Cell(0, 2), this);
-            StartBoard[0, 3] = new Queen (PlayerColor.Black, new Cell(0, 3), this);
-            StartBoard[0, 4] = new King  (PlayerColor.Black, new Cell(0, 4), this);
-            StartBoard[0, 5] = new Bishop(PlayerColor.Black, new Cell(0, 5), this);
-            StartBoard[0, 6] = new Knight(PlayerColor.Black, new Cell(0, 6), this);
-            StartBoard[0, 7] = new Rook  (PlayerColor.Black, new Cell(0, 7), this);
+            StartBoard[0, row.Rook1] =   new Rook  (PlayerColor.Black, new Cell(0, row.Rook1), this);
+            StartBoard[0, row.Knight1] = new Knight(PlayerColor.Black, new Cell(0, row.Knight1), this);
+            StartBoard[0, row.Bishop1] = new Bishop(PlayerColor.Black, new Cell(0, row.Bishop1), this);
+            StartBoard[0, row.Queen] =   new Queen (PlayerColor.Black, new Cell(0, row.Queen), this);
+            StartBoard[0, row.King] =    new King  (PlayerColor.Black, new Cell(0, row.King), this);
+            StartBoard[0, row.Bishop2] = new Bishop(PlayerColor.Black, new Cell(0, row.Bishop2), this);
+            StartBoard[0, row.Knight2] = new Knight(PlayerColor.Black, new Cell(0, row.Knight2), this);
+            StartBoard[0, row.Rook2] =   new Rook  (PlayerColor.Black, new Cell(0, row.Rook2), this);
 
             StartBoard[1, 0] = new Pawn(PlayerColor.Black, new Cell(1, 0), this);
             StartBoard[1, 1] = new Pawn(PlayerColor.Black, new Cell(1, 1), this);
@@ -44,19 +46,19 @@ namespace FisherChessServer.Core.Models
             StartBoard[6, 6] = new Pawn(PlayerColor.White, new Cell(6, 6), this);
             StartBoard[6, 7] = new Pawn(PlayerColor.White, new Cell(6, 7), this);
 
-            StartBoard[7, 0] = new Rook  (PlayerColor.White, new Cell(7, 0), this);
-            StartBoard[7, 1] = new Knight(PlayerColor.White, new Cell(7, 1), this);
-            StartBoard[7, 2] = new Bishop(PlayerColor.White, new Cell(7, 2), this);
-            StartBoard[7, 3] = new Queen (PlayerColor.White, new Cell(7, 3), this);
-            StartBoard[7, 4] = new King  (PlayerColor.White, new Cell(7, 4), this);
-            StartBoard[7, 5] = new Bishop(PlayerColor.White, new Cell(7, 5), this);
-            StartBoard[7, 6] = new Knight(PlayerColor.White, new Cell(7, 6), this);
-            StartBoard[7, 7] = new Rook  (PlayerColor.White, new Cell(7, 7), this);
+            StartBoard[7, row.Rook1] =   new Rook  (PlayerColor.White, new Cell(7, row.Rook1), this);
+            StartBoard[7, row.Knight1] = new Knight(PlayerColor.White, new Cell(7, row.Knight1), this);
+            StartBoard[7, row.Bishop1] = new Bishop(PlayerColor.White, new Cell(7, row.Bishop1), this);
+            StartBoard[7, row.Queen] =   new Queen (PlayerColor.White, new Cell(7, row.Queen), this);
+            StartBoard[7, row.King] =    new King  (PlayerColor.White, new Cell(7, row.King), this);
+            StartBoard[7, row.Bishop2] = new Bishop(PlayerColor.White, new Cell(7, row.Bishop2), this);
+            StartBoard[7, row.Knight2] = new Knight(PlayerColor.White, new Cell(7, row.Knight2), this);
+            StartBoard[7, row.Rook2] =   new Rook  (PlayerColor.White, new Cell(7, row.Rook2), this);
 
             #endregion
 
-            _whiteKing = StartBoard[7, 4]!;
-            _blackKing = StartBoard[0, 4]!;
+            _whiteKing = StartBoard[7, row.King]!;
+            _blackKing = StartBoard[0, row.King]!;
 
             Reset();
         }
@@ -98,6 +100,56 @@ namespace FisherChessServer.Core.Models
             this[cell] = piece;
         }
 
+        private static RandomPiecesRow GenerateRandomPiecesPlacement()
+        {
+            var random = new Random();
+            var emptyIndeces = new List<int>();
+            var row = new RandomPiecesRow();
+            for (int i = 0; i < Length; i++)
+            {
+                emptyIndeces.Add(i);
+            }
+
+            // King possible placements: [.kkkkkk.]
+            row.King = random.Next(1, Length - 1);
+            emptyIndeces.Remove(row.King);
+
+            // Left rook must be before king [rrrrrk..]
+            row.Rook1 = random.Next(0, row.King);
+            emptyIndeces.Remove(row.Rook1);
+
+            // Right rook must be after king [.....krr]
+            row.Rook2 = random.Next(row.King + 1, Length);
+            emptyIndeces.Remove(row.Rook2);
+
+            // Odd bishop must occupy only odd empty cell [b.b.b.b.]
+            do
+            {
+                row.Bishop1 = emptyIndeces[random.Next(emptyIndeces.Count)];
+            } while (row.Bishop1 % 2 == 1);
+            emptyIndeces.Remove(row.Bishop1);
+
+            // Even bishop must occupy only even empty cell [.b.b.b.b]
+            do
+            {
+                row.Bishop2 = emptyIndeces[random.Next(emptyIndeces.Count)];
+            } while (row.Bishop2 % 2 == 0);
+            emptyIndeces.Remove(row.Bishop2);
+
+            // First knight must occupy an empty cell
+            row.Knight1 = emptyIndeces[random.Next(emptyIndeces.Count)];
+            emptyIndeces.Remove(row.Knight1);
+
+            // Second knight must occupy an empty cell
+            row.Knight2 = emptyIndeces[random.Next(emptyIndeces.Count)];
+            emptyIndeces.Remove(row.Knight2);
+
+            // Queen is placed on the last empty cell
+            row.Queen = emptyIndeces.Last();
+
+            return row;
+        }
+
         public void Reset()
         {
             for (int i = 0; i < Length; i++)
@@ -108,6 +160,18 @@ namespace FisherChessServer.Core.Models
                     this[cell] = StartBoard[i, j];
                 }
             }
+        }
+
+        private class RandomPiecesRow
+        {
+            public int Rook1 { get; set; }
+            public int Knight1 { get; set; }
+            public int Bishop1 { get; set; }
+            public int Queen { get; set; }
+            public int King { get; set; }
+            public int Bishop2 { get; set; }
+            public int Knight2 { get; set; }
+            public int Rook2 { get; set; }
         }
     }
 }
