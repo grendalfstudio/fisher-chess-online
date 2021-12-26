@@ -76,10 +76,29 @@ namespace FisherChessServer.Core.Models
             };
         }
 
+        public Piece GetQueensideRook(PlayerColor color)
+        {
+            return color switch
+            {
+                PlayerColor.White => _whitePlayerPieces.Rook1,
+                PlayerColor.Black => _blackPlayerPieces.Rook1,
+                _ => throw new NotImplementedException()
+            };
+        }
+
+        public Piece GetKingsideRook(PlayerColor color)
+        {
+            return color switch
+            {
+                PlayerColor.White => _whitePlayerPieces.Rook2,
+                PlayerColor.Black => _blackPlayerPieces.Rook2,
+                _ => throw new NotImplementedException()
+            };
+        }
+        
         public IEnumerable<Piece> GetAllPieces()
         {
-            return _whitePlayerPieces.GetPieces()
-                .Concat(_blackPlayerPieces.GetPieces());
+            return _whitePlayerPieces.GetPieces().Concat(_blackPlayerPieces.GetPieces());
         }
 
         public void MakeMove(Piece piece, Cell cell)
