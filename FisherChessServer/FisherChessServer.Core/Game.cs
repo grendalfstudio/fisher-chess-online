@@ -16,6 +16,8 @@ namespace FisherChessServer.Core
             _gameService = gameService;
         }
 
+        public event EventHandler<Piece>? OnPawnPromoting;
+
         public bool IsGameStarted { get; set; }
         public bool CanWhiteCastleQueenside { get; set; }
         public bool CanWhiteCastleKingside { get; set; }
@@ -63,7 +65,7 @@ namespace FisherChessServer.Core
         {
             UpdateCastlingPossibilities(piece);
 
-            Piece? pieceOnTheCell = _gameService.GetPieceAt(cell);
+            Piece? pieceOnTheCell = _gameService.GetPieceAt(cell);            
             if (piece.Type == PieceType.King && pieceOnTheCell != null && 
                 pieceOnTheCell.Color == piece.Color && pieceOnTheCell.Type == PieceType.Rook)
             {
@@ -72,6 +74,13 @@ namespace FisherChessServer.Core
             else
             {
                 _gameService.MakeMove(piece, cell);
+
+                if (piece.Type == PieceType.Pawn && ((CurrentPlayer == PlayerColor.White && cell.Row == 0) ||
+                (CurrentPlayer == PlayerColor.Black && cell.Row == Chessboard.Length - 1)))
+                {
+                    var queen = _gameService.Promote(piece);
+                    OnPawnPromoting?.Invoke(this, queen);
+                }
             }
             WhitePlayerState = _gameService.GetPlayerState(PlayerColor.White);
             BlackPlayerState = _gameService.GetPlayerState(PlayerColor.Black);

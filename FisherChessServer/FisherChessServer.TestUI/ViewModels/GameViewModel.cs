@@ -16,6 +16,7 @@ namespace FisherChessServer.TestUI.ViewModels
         protected readonly GameWindow _gameWindow;
         protected readonly Game _Game;
         private readonly List<PieceViewModel> _pieces;
+        private readonly List<PieceViewModel> _promotedPawns;
         protected readonly Timer _oneSecondTimer = new Timer { Interval = 1000 };
         protected readonly List<HighlightViewModel> _highlights = new List<HighlightViewModel>();
         protected PieceViewModel? _choosedPieceViewModel;
@@ -36,6 +37,7 @@ namespace FisherChessServer.TestUI.ViewModels
         {
             _gameWindow = gameWindow;
             _Game = new Game(new GameService(new Chessboard()));
+            _Game.OnPawnPromoting += _Game_OnPawnPromoting;
 
             _pieces = new List<PieceViewModel>(_Game.GetAllPieces()
                 .Select(piece => new PieceViewModel(piece)));
@@ -44,6 +46,7 @@ namespace FisherChessServer.TestUI.ViewModels
                 pieceViewModel.OnImageClicked += PieceViewModel_OnImageClicked;
                 _gameWindow.grid.Children.Add(pieceViewModel.Image);
             });
+            _promotedPawns = new List<PieceViewModel>();
 
             _isNewGameButtonEnabled = true;
             _isFinishGameButtonEnabled = false;
@@ -122,6 +125,14 @@ namespace FisherChessServer.TestUI.ViewModels
             {
                 return _startGameCommand ??= new RelayCommand(obj =>
                 {
+                    // Restore pieces to initial configuration after promotions in previous game
+                    _promotedPawns.ForEach(pawnVM =>
+                    {
+                        _pieces.Remove(pawnVM);
+                        _gameWindow.grid.Children.Remove(pawnVM.Image);
+                    });
+                    _pieces.ForEach(pieceVM => pieceVM.Image.Visibility = Visibility.Visible);
+
                     _Game.StartGame();
 
                     WhitePlayerState = _Game.WhitePlayerState.ToString();
@@ -246,6 +257,19 @@ namespace FisherChessServer.TestUI.ViewModels
         {
             _cellToMakeMove = ((HighlightViewModel)sender!).Cell;
             MakeMoveCommand.Execute(null);
+        }
+
+        private void _Game_OnPawnPromoting(object? sender, Piece e)
+        {
+            PieceViewModel pieceViewModel = _pieces.Where(pieceVM => pieceVM.Piece.Cell == e.Cell).Single();
+            pieceViewModel.Image.Visibility = Visibility.Collapsed;
+
+            var promotedPieceViewModel = new PieceViewModel(e);
+            _pieces.Add(promotedPieceViewModel);
+            _promotedPawns.Add(promotedPieceViewModel);
+
+            promotedPieceViewModel.OnImageClicked += PieceViewModel_OnImageClicked;
+            _gameWindow.grid.Children.Add(promotedPieceViewModel.Image);
         }
 
         private void OneSecond_Elapsed(object? sender, ElapsedEventArgs e)

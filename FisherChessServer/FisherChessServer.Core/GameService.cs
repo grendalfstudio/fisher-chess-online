@@ -92,6 +92,13 @@ namespace FisherChessServer.Core
             return _chessboard[cell];
         }
 
+        public Piece Promote(Piece piece)
+        {
+            var queen = new Queen(piece.Color, piece.Cell, _chessboard);
+            _chessboard[piece.Cell!] = queen;
+            return queen;
+        }
+
         public Piece GetKing(PlayerColor color)
         {
             return _chessboard.GetKing(color);
