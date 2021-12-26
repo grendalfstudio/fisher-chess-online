@@ -101,17 +101,6 @@ namespace FisherChessServer.Core.Models
             return _whitePlayerPieces.GetPieces().Concat(_blackPlayerPieces.GetPieces());
         }
 
-        public void MakeMove(Piece piece, Cell cell)
-        {
-            // If there was piece on the cell, it disappears
-            if (this[cell] != null)
-                this[cell]!.Cell = null;
-
-            // Piece cell became empty and piece is moved to a new cell
-            this[piece.Cell!] = null;
-            this[cell] = piece;
-        }
-
         private static RandomPiecesRow GenerateRandomPiecesPlacement()
         {
             var random = new Random();

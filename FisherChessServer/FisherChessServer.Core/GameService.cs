@@ -45,7 +45,13 @@ namespace FisherChessServer.Core
 
         public void MakeMove(Piece piece, Cell cell)
         {
-            _chessboard.MakeMove(piece, cell);
+            // If there was piece on the cell, it disappears
+            if (_chessboard[cell] != null)
+                _chessboard[cell]!.Cell = null;
+
+            // Piece cell became empty and piece is moved to a new cell
+            _chessboard[piece.Cell!] = null;
+            _chessboard[cell] = piece;
         }
 
         public void DoCastling(Piece king, Piece rook)
