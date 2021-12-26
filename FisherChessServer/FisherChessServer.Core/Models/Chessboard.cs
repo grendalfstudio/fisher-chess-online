@@ -6,62 +6,51 @@ namespace FisherChessServer.Core.Models
     {
         public static readonly int Length = 8;
 
-        private readonly Piece _whiteKing;
-        private readonly Piece _blackKing;
+        private readonly PlayerPieces _whitePlayerPieces;
+        private readonly PlayerPieces _blackPlayerPieces;
 
         public Chessboard()
         {
-            #region Black pieces initialisation
+            _whitePlayerPieces = new PlayerPieces(PlayerColor.White, this);
+            _blackPlayerPieces = new PlayerPieces(PlayerColor.Black, this);
 
-            StartBoard[0, 0] = new Rook  (PlayerColor.Black, new Cell(0, 0), this);
-            StartBoard[0, 1] = new Knight(PlayerColor.Black, new Cell(0, 1), this);
-            StartBoard[0, 2] = new Bishop(PlayerColor.Black, new Cell(0, 2), this);
-            StartBoard[0, 3] = new Queen (PlayerColor.Black, new Cell(0, 3), this);
-            StartBoard[0, 4] = new King  (PlayerColor.Black, new Cell(0, 4), this);
-            StartBoard[0, 5] = new Bishop(PlayerColor.Black, new Cell(0, 5), this);
-            StartBoard[0, 6] = new Knight(PlayerColor.Black, new Cell(0, 6), this);
-            StartBoard[0, 7] = new Rook  (PlayerColor.Black, new Cell(0, 7), this);
+            #region Black pieces placement
 
-            StartBoard[1, 0] = new Pawn(PlayerColor.Black, new Cell(1, 0), this);
-            StartBoard[1, 1] = new Pawn(PlayerColor.Black, new Cell(1, 1), this);
-            StartBoard[1, 2] = new Pawn(PlayerColor.Black, new Cell(1, 2), this);
-            StartBoard[1, 3] = new Pawn(PlayerColor.Black, new Cell(1, 3), this);
-            StartBoard[1, 4] = new Pawn(PlayerColor.Black, new Cell(1, 4), this);
-            StartBoard[1, 5] = new Pawn(PlayerColor.Black, new Cell(1, 5), this);
-            StartBoard[1, 6] = new Pawn(PlayerColor.Black, new Cell(1, 6), this);
-            StartBoard[1, 7] = new Pawn(PlayerColor.Black, new Cell(1, 7), this);
+            this[new Cell(0, 0)] = _blackPlayerPieces.Rook1;
+            this[new Cell(0, 1)] = _blackPlayerPieces.Knight1;
+            this[new Cell(0, 2)] = _blackPlayerPieces.Bishop1;
+            this[new Cell(0, 3)] = _blackPlayerPieces.Queen;
+            this[new Cell(0, 4)] = _blackPlayerPieces.King;
+            this[new Cell(0, 5)] = _blackPlayerPieces.Bishop2;
+            this[new Cell(0, 6)] = _blackPlayerPieces.Knight2;
+            this[new Cell(0, 7)] = _blackPlayerPieces.Rook2;
 
-            #endregion
-
-            #region White pieces initialisation
-
-            StartBoard[6, 0] = new Pawn(PlayerColor.White, new Cell(6, 0), this);
-            StartBoard[6, 1] = new Pawn(PlayerColor.White, new Cell(6, 1), this);
-            StartBoard[6, 2] = new Pawn(PlayerColor.White, new Cell(6, 2), this);
-            StartBoard[6, 3] = new Pawn(PlayerColor.White, new Cell(6, 3), this);
-            StartBoard[6, 4] = new Pawn(PlayerColor.White, new Cell(6, 4), this);
-            StartBoard[6, 5] = new Pawn(PlayerColor.White, new Cell(6, 5), this);
-            StartBoard[6, 6] = new Pawn(PlayerColor.White, new Cell(6, 6), this);
-            StartBoard[6, 7] = new Pawn(PlayerColor.White, new Cell(6, 7), this);
-
-            StartBoard[7, 0] = new Rook  (PlayerColor.White, new Cell(7, 0), this);
-            StartBoard[7, 1] = new Knight(PlayerColor.White, new Cell(7, 1), this);
-            StartBoard[7, 2] = new Bishop(PlayerColor.White, new Cell(7, 2), this);
-            StartBoard[7, 3] = new Queen (PlayerColor.White, new Cell(7, 3), this);
-            StartBoard[7, 4] = new King  (PlayerColor.White, new Cell(7, 4), this);
-            StartBoard[7, 5] = new Bishop(PlayerColor.White, new Cell(7, 5), this);
-            StartBoard[7, 6] = new Knight(PlayerColor.White, new Cell(7, 6), this);
-            StartBoard[7, 7] = new Rook  (PlayerColor.White, new Cell(7, 7), this);
+            for (int i = 0; i < Length; i++)
+            {
+                this[new Cell(1, i)] = _blackPlayerPieces.Pawns[i];
+            }
 
             #endregion
 
-            _whiteKing = StartBoard[7, 4]!;
-            _blackKing = StartBoard[0, 4]!;
+            #region White pieces placement
 
-            Reset();
+            for (int i = 0; i < Length; i++)
+            {
+                this[new Cell(6, i)] = _whitePlayerPieces.Pawns[i];
+            }
+
+            this[new Cell(7, 0)] = _whitePlayerPieces.Rook1;
+            this[new Cell(7, 1)] = _whitePlayerPieces.Knight1;
+            this[new Cell(7, 2)] = _whitePlayerPieces.Bishop1;
+            this[new Cell(7, 3)] = _whitePlayerPieces.Queen;
+            this[new Cell(7, 4)] = _whitePlayerPieces.King;
+            this[new Cell(7, 5)] = _whitePlayerPieces.Bishop2;
+            this[new Cell(7, 6)] = _whitePlayerPieces.Knight2;
+            this[new Cell(7, 7)] = _whitePlayerPieces.Rook2;
+
+            #endregion
         }
 
-        public Piece?[,] StartBoard { get; } = new Piece?[Length, Length];
         public Piece?[,] Board { get; } = new Piece?[Length, Length];
 
         public Piece? this[Cell cell]
@@ -81,33 +70,146 @@ namespace FisherChessServer.Core.Models
         {
             return color switch
             {
-                PlayerColor.White => _whiteKing,
-                PlayerColor.Black => _blackKing,
+                PlayerColor.White => _whitePlayerPieces.King,
+                PlayerColor.Black => _blackPlayerPieces.King,
                 _ => throw new NotImplementedException()
             };
         }
 
-        public void MakeMove(Piece piece, Cell cell)
+        public Piece GetQueensideRook(PlayerColor color)
         {
-            // If there was piece on the cell, it disappears
-            if (this[cell] != null)
-                this[cell]!.Cell = null;
+            return color switch
+            {
+                PlayerColor.White => _whitePlayerPieces.Rook1,
+                PlayerColor.Black => _blackPlayerPieces.Rook1,
+                _ => throw new NotImplementedException()
+            };
+        }
 
-            // Piece cell became empty and piece is moved to a new cell
-            this[piece.Cell!] = null;
-            this[cell] = piece;
+        public Piece GetKingsideRook(PlayerColor color)
+        {
+            return color switch
+            {
+                PlayerColor.White => _whitePlayerPieces.Rook2,
+                PlayerColor.Black => _blackPlayerPieces.Rook2,
+                _ => throw new NotImplementedException()
+            };
+        }
+        
+        public IEnumerable<Piece> GetAllPieces()
+        {
+            return _whitePlayerPieces.GetPieces().Concat(_blackPlayerPieces.GetPieces());
+        }
+
+        private static RandomPiecesRow GenerateRandomPiecesPlacement()
+        {
+            var random = new Random();
+            var emptyIndeces = new List<int>();
+            var row = new RandomPiecesRow();
+            for (int i = 0; i < Length; i++)
+            {
+                emptyIndeces.Add(i);
+            }
+
+            // King possible placements: [.kkkkkk.]
+            row.King = random.Next(1, Length - 1);
+            emptyIndeces.Remove(row.King);
+
+            // Left rook must be before king [rrrrrk..]
+            row.Rook1 = random.Next(0, row.King);
+            emptyIndeces.Remove(row.Rook1);
+
+            // Right rook must be after king [.....krr]
+            row.Rook2 = random.Next(row.King + 1, Length);
+            emptyIndeces.Remove(row.Rook2);
+
+            // Odd bishop must occupy only odd empty cell [b.b.b.b.]
+            do
+            {
+                row.Bishop1 = emptyIndeces[random.Next(emptyIndeces.Count)];
+            } while (row.Bishop1 % 2 == 1);
+            emptyIndeces.Remove(row.Bishop1);
+
+            // Even bishop must occupy only even empty cell [.b.b.b.b]
+            do
+            {
+                row.Bishop2 = emptyIndeces[random.Next(emptyIndeces.Count)];
+            } while (row.Bishop2 % 2 == 0);
+            emptyIndeces.Remove(row.Bishop2);
+
+            // First knight must occupy an empty cell
+            row.Knight1 = emptyIndeces[random.Next(emptyIndeces.Count)];
+            emptyIndeces.Remove(row.Knight1);
+
+            // Second knight must occupy an empty cell
+            row.Knight2 = emptyIndeces[random.Next(emptyIndeces.Count)];
+            emptyIndeces.Remove(row.Knight2);
+
+            // Queen is placed on the last empty cell
+            row.Queen = emptyIndeces.Last();
+
+            return row;
         }
 
         public void Reset()
         {
+            RandomPiecesRow row = GenerateRandomPiecesPlacement();
+
+            #region Black pieces placement
+
+            this[new Cell(0, row.Rook1)] =   _blackPlayerPieces.Rook1;
+            this[new Cell(0, row.Knight1)] = _blackPlayerPieces.Knight1;
+            this[new Cell(0, row.Bishop1)] = _blackPlayerPieces.Bishop1;
+            this[new Cell(0, row.Queen)] =   _blackPlayerPieces.Queen;
+            this[new Cell(0, row.King)] =    _blackPlayerPieces.King;
+            this[new Cell(0, row.Bishop2)] = _blackPlayerPieces.Bishop2;
+            this[new Cell(0, row.Knight2)] = _blackPlayerPieces.Knight2;
+            this[new Cell(0, row.Rook2)] =   _blackPlayerPieces.Rook2;
+
             for (int i = 0; i < Length; i++)
+            {
+                this[new Cell(1, i)] = _blackPlayerPieces.Pawns[i];
+            }
+
+            for (int i = 2; i < 6; i++)
             {
                 for (int j = 0; j < Length; j++)
                 {
-                    var cell = new Cell(i, j);
-                    this[cell] = StartBoard[i, j];
+                    this[new Cell(i, j)] = null;
                 }
             }
+
+            #endregion
+
+            #region White pieces placement
+
+            for (int i = 0; i < Length; i++)
+            {
+                this[new Cell(6, i)] = _whitePlayerPieces.Pawns[i];
+            }
+
+            this[new Cell(7, row.Rook1)] =   _whitePlayerPieces.Rook1;
+            this[new Cell(7, row.Knight1)] = _whitePlayerPieces.Knight1;
+            this[new Cell(7, row.Bishop1)] = _whitePlayerPieces.Bishop1;
+            this[new Cell(7, row.Queen)] =   _whitePlayerPieces.Queen;
+            this[new Cell(7, row.King)] =    _whitePlayerPieces.King;
+            this[new Cell(7, row.Bishop2)] = _whitePlayerPieces.Bishop2;
+            this[new Cell(7, row.Knight2)] = _whitePlayerPieces.Knight2;
+            this[new Cell(7, row.Rook2)] =   _whitePlayerPieces.Rook2;
+
+            #endregion
+        }
+
+        private class RandomPiecesRow
+        {
+            public int Rook1 { get; set; }
+            public int Knight1 { get; set; }
+            public int Bishop1 { get; set; }
+            public int Queen { get; set; }
+            public int King { get; set; }
+            public int Bishop2 { get; set; }
+            public int Knight2 { get; set; }
+            public int Rook2 { get; set; }
         }
     }
 }

@@ -16,7 +16,13 @@ namespace FisherChessServer.Core
             _gameService = gameService;
         }
 
+        public event EventHandler<Piece>? OnPawnPromoting;
+
         public bool IsGameStarted { get; set; }
+        public bool CanWhiteCastleQueenside { get; set; }
+        public bool CanWhiteCastleKingside { get; set; }
+        public bool CanBlackCastleQueenside { get; set; }
+        public bool CanBlackCastleKingside { get; set; }
         public PlayerColor CurrentPlayer { get; set; }
         public PlayerState WhitePlayerState { get; private set; }
         public PlayerState BlackPlayerState { get; private set; }
@@ -25,6 +31,10 @@ namespace FisherChessServer.Core
         {
             _gameService.ResetChessboard();
             IsGameStarted = true;
+            CanWhiteCastleQueenside = true;
+            CanWhiteCastleKingside = true;
+            CanBlackCastleQueenside = true;
+            CanBlackCastleKingside = true;
 
             CurrentPlayer = PlayerColor.White;
             WhitePlayerState = BlackPlayerState = PlayerState.Regular;
@@ -32,14 +42,46 @@ namespace FisherChessServer.Core
 
         public IEnumerable<Cell> FindAvailableCells(Piece piece)
         {
-            return IsGameStarted && piece.Color == CurrentPlayer
-                ? _gameService.FindAvailableCells(piece)
-                : new List<Cell>();
+            if (!IsGameStarted || piece.Color != CurrentPlayer)
+                return new List<Cell>();
+
+            var availableCells = new List<Cell>(_gameService.FindAvailableCells(piece));
+            if (piece.Type == PieceType.King)
+            {
+                if (_gameService.IsQueensideCastlingAvailable(CurrentPlayer, CanWhiteCastleQueenside, CanBlackCastleQueenside))
+                {
+                    availableCells.Add(_gameService.GetQueensideRook(piece.Color).Cell!);
+                }
+                if (_gameService.IsKingsideCastlingAvailable(CurrentPlayer, CanWhiteCastleKingside, CanBlackCastleKingside))
+                {
+                    availableCells.Add(_gameService.GetKingsideRook(piece.Color).Cell!);
+                }
+            }
+
+            return availableCells;
         }
 
         public void MakeMove(Piece piece, Cell cell)
         {
-            _gameService.MakeMove(piece, cell);
+            UpdateCastlingPossibilities(piece);
+
+            Piece? pieceOnTheCell = _gameService.GetPieceAt(cell);            
+            if (piece.Type == PieceType.King && pieceOnTheCell != null && 
+                pieceOnTheCell.Color == piece.Color && pieceOnTheCell.Type == PieceType.Rook)
+            {
+                _gameService.DoCastling(piece, pieceOnTheCell);
+            }
+            else
+            {
+                _gameService.MakeMove(piece, cell);
+
+                if (piece.Type == PieceType.Pawn && ((CurrentPlayer == PlayerColor.White && cell.Row == 0) ||
+                (CurrentPlayer == PlayerColor.Black && cell.Row == Chessboard.Length - 1)))
+                {
+                    var queen = _gameService.Promote(piece);
+                    OnPawnPromoting?.Invoke(this, queen);
+                }
+            }
             WhitePlayerState = _gameService.GetPlayerState(PlayerColor.White);
             BlackPlayerState = _gameService.GetPlayerState(PlayerColor.Black);
 
@@ -51,7 +93,7 @@ namespace FisherChessServer.Core
             IsGameStarted = false;
         }
 
-        public Piece GetPieceAt(Cell cell)
+        public Piece? GetPieceAt(Cell cell)
         {
             return _gameService.GetPieceAt(cell);
         }
@@ -69,6 +111,62 @@ namespace FisherChessServer.Core
                 PlayerColor.Black => PlayerColor.White,
                 _ => throw new NotImplementedException()
             };
+        }
+
+        private void UpdateCastlingPossibilities(Piece piece)
+        {
+            if (piece.Type == PieceType.King)
+            {
+                switch (piece.Color)
+                {
+                    case PlayerColor.White:
+                        if (CanWhiteCastleQueenside) 
+                            CanWhiteCastleQueenside = false;
+                        if (CanWhiteCastleKingside) 
+                            CanWhiteCastleKingside = false;
+                        break;
+                    case PlayerColor.Black:
+                        if (CanBlackCastleQueenside)
+                            CanBlackCastleQueenside = false;
+                        if (CanBlackCastleKingside)
+                            CanBlackCastleKingside = false;
+                        break;
+                }
+            }
+            else if (piece.Type == PieceType.Rook)
+            {
+                int kingColumn = _gameService.GetKing(piece.Color).Cell!.Column;
+                // If rook is on the left having right to castle queenside 
+                if (piece.Cell!.Column < kingColumn)
+                {
+                    switch (piece.Color)
+                    {
+                        case PlayerColor.White:
+                            if (CanWhiteCastleQueenside)
+                                CanWhiteCastleQueenside = false;
+                            break;
+                        case PlayerColor.Black:
+                            if (CanBlackCastleQueenside)
+                                CanBlackCastleQueenside = false;
+                            break;
+                    }
+                }
+                // If rook is on the right having right to castle kingside
+                else if (piece.Cell!.Column > kingColumn)
+                {
+                    switch (piece.Color)
+                    {
+                        case PlayerColor.White:
+                            if (CanWhiteCastleKingside)
+                                CanWhiteCastleKingside = false;
+                            break;
+                        case PlayerColor.Black:
+                            if (CanBlackCastleKingside)
+                                CanBlackCastleKingside = false;
+                            break;
+                    }
+                }
+            }
         }
     }
 }

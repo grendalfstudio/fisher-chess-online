@@ -14,8 +14,9 @@ namespace FisherChessServer.TestUI.ViewModels
     public class GameViewModel : ViewModelBase
     {
         protected readonly GameWindow _gameWindow;
-        protected readonly Game _Game;
+        protected readonly Game _game;
         private readonly List<PieceViewModel> _pieces;
+        private readonly List<PieceViewModel> _promotedPawns;
         protected readonly Timer _oneSecondTimer = new Timer { Interval = 1000 };
         protected readonly List<HighlightViewModel> _highlights = new List<HighlightViewModel>();
         protected PieceViewModel? _choosedPieceViewModel;
@@ -35,15 +36,17 @@ namespace FisherChessServer.TestUI.ViewModels
         public GameViewModel(GameWindow gameWindow)
         {
             _gameWindow = gameWindow;
-            _Game = new Game(new GameService(new Chessboard()));
+            _game = new Game(new GameService(new Chessboard()));
+            _game.OnPawnPromoting += Game_OnPawnPromoting;
 
-            _pieces = new List<PieceViewModel>(_Game.GetAllPieces()
+            _pieces = new List<PieceViewModel>(_game.GetAllPieces()
                 .Select(piece => new PieceViewModel(piece)));
             _pieces.ForEach(pieceViewModel =>
             {
                 pieceViewModel.OnImageClicked += PieceViewModel_OnImageClicked;
                 _gameWindow.grid.Children.Add(pieceViewModel.Image);
             });
+            _promotedPawns = new List<PieceViewModel>();
 
             _isNewGameButtonEnabled = true;
             _isFinishGameButtonEnabled = false;
@@ -122,11 +125,19 @@ namespace FisherChessServer.TestUI.ViewModels
             {
                 return _startGameCommand ??= new RelayCommand(obj =>
                 {
-                    _Game.StartGame();
+                    // Restore pieces to initial configuration after promotions in previous game
+                    _promotedPawns.ForEach(pawnVM =>
+                    {
+                        _pieces.Remove(pawnVM);
+                        _gameWindow.grid.Children.Remove(pawnVM.Image);
+                    });
+                    _pieces.ForEach(pieceVM => pieceVM.Image.Visibility = Visibility.Visible);
 
-                    WhitePlayerState = _Game.WhitePlayerState.ToString();
-                    BlackPlayerState = _Game.BlackPlayerState.ToString();
-                    switch (_Game.CurrentPlayer)
+                    _game.StartGame();
+
+                    WhitePlayerState = _game.WhitePlayerState.ToString();
+                    BlackPlayerState = _game.BlackPlayerState.ToString();
+                    switch (_game.CurrentPlayer)
                     {
                         case PlayerColor.White:
                             WhitePlayerHighlight = "#FFC8FFC8";
@@ -153,13 +164,13 @@ namespace FisherChessServer.TestUI.ViewModels
                 return _findAvailableCellsCommand ??= new RelayCommand(obj =>
                 {
                     Piece choosedPiece = _choosedPieceViewModel!.Piece;
-                    IEnumerable<Cell> availableCells = _Game.FindAvailableCells(choosedPiece);
+                    IEnumerable<Cell> availableCells = _game.FindAvailableCells(choosedPiece);
 
                     _highlights.Add(new HighlightViewModel(HighlightType.ChoosedPiece, choosedPiece.Cell!));
                     _highlights.AddRange(availableCells.Select(cell =>
                     {
                         var highlight = HighlightType.ValidMove;
-                        if (_Game.GetPieceAt(cell) != null)
+                        if (_game.GetPieceAt(cell) != null)
                             highlight = HighlightType.ValidMoveOnPiece;
 
                         var highlightViewModel = new HighlightViewModel(highlight, cell);
@@ -180,10 +191,10 @@ namespace FisherChessServer.TestUI.ViewModels
             {
                 return _makeMoveCommand ??= new RelayCommand(obj =>
                 {
-                    _Game.MakeMove(_choosedPieceViewModel!.Piece, _cellToMakeMove);
-                    WhitePlayerState = _Game.WhitePlayerState.ToString();
-                    BlackPlayerState = _Game.BlackPlayerState.ToString();
-                    switch (_Game.CurrentPlayer)
+                    _game.MakeMove(_choosedPieceViewModel!.Piece, _cellToMakeMove);
+                    WhitePlayerState = _game.WhitePlayerState.ToString();
+                    BlackPlayerState = _game.BlackPlayerState.ToString();
+                    switch (_game.CurrentPlayer)
                     {
                         case PlayerColor.White:
                             WhitePlayerHighlight = "#FFC8FFC8";
@@ -197,8 +208,8 @@ namespace FisherChessServer.TestUI.ViewModels
                     _highlights.ForEach(highlight => _gameWindow.grid.Children.Remove(highlight.Image));
                     _highlights.Clear();
 
-                    if (_Game.WhitePlayerState == PlayerState.Checkmate ||
-                        _Game.BlackPlayerState == PlayerState.Checkmate)
+                    if (_game.WhitePlayerState == PlayerState.Checkmate ||
+                        _game.BlackPlayerState == PlayerState.Checkmate)
                     {
                         FinishGameCommand.Execute(null);
                     }
@@ -215,7 +226,7 @@ namespace FisherChessServer.TestUI.ViewModels
                     var messageAnswer = App.ShowMessage("Справді завершити гру?", true);
                     if (messageAnswer == MessageBoxResult.Yes)
                     {
-                        _Game.FinishGame();
+                        _game.FinishGame();
 
                         IsNewGameButtonEnabled = true;
                         IsFinishGameButtonEnabled = false;
@@ -246,6 +257,19 @@ namespace FisherChessServer.TestUI.ViewModels
         {
             _cellToMakeMove = ((HighlightViewModel)sender!).Cell;
             MakeMoveCommand.Execute(null);
+        }
+
+        private void Game_OnPawnPromoting(object? sender, Piece e)
+        {
+            PieceViewModel pieceViewModel = _pieces.Where(pieceVM => pieceVM.Piece.Cell == e.Cell).Single();
+            pieceViewModel.Piece.Cell = null;
+
+            var promotedPieceViewModel = new PieceViewModel(e);
+            _pieces.Add(promotedPieceViewModel);
+            _promotedPawns.Add(promotedPieceViewModel);
+
+            promotedPieceViewModel.OnImageClicked += PieceViewModel_OnImageClicked;
+            _gameWindow.grid.Children.Add(promotedPieceViewModel.Image);
         }
 
         private void OneSecond_Elapsed(object? sender, ElapsedEventArgs e)

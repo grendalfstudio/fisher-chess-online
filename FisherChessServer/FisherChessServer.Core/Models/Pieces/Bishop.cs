@@ -8,7 +8,7 @@ namespace FisherChessServer.Core.Models.Pieces
 {
     public class Bishop : Piece
     {
-        public Bishop(PlayerColor color, Cell cell, Chessboard chessboard) : base(PieceType.Bishop, color, cell, chessboard)
+        public Bishop(PlayerColor color, Cell? cell, Chessboard chessboard) : base(PieceType.Bishop, color, cell, chessboard)
         {
         }
 

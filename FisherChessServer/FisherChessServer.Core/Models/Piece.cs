@@ -10,7 +10,7 @@ namespace FisherChessServer.Core.Models
     {
         private Cell? _cell;
 
-        protected Piece(PieceType type, PlayerColor color, Cell cell, Chessboard chessboard)
+        protected Piece(PieceType type, PlayerColor color, Cell? cell, Chessboard chessboard)
         {
             Type = type;
             Color = color;

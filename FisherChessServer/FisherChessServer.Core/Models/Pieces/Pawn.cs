@@ -8,7 +8,7 @@ namespace FisherChessServer.Core.Models.Pieces
 {
     public class Pawn : Piece
     {
-        public Pawn(PlayerColor color, Cell cell, Chessboard chessboard) : base(PieceType.Pawn, color, cell, chessboard)
+        public Pawn(PlayerColor color, Cell? cell, Chessboard chessboard) : base(PieceType.Pawn, color, cell, chessboard)
         {
         }
 
