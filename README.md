@@ -1,3 +1,3 @@
 # fisher-chess-online
 
-Client-server implementation of Fisher chess (aka Chess960). 
+Standalone implementation of Fisher chess (aka Chess960) with GUI on WPF.
